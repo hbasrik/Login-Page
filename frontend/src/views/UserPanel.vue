@@ -1,0 +1,272 @@
+<template>
+    <div class="dashboard">
+      <div class="header">
+        <img src="@/assets/icon.png" alt="Logo" class="logo" />
+       
+        <div class="profile-dropdown">
+          <button @click="toggleDropdown" class="profile-button">
+            <i class="fas fa-user profile-icon"></i>
+            <span class="dropdown-icon">&#x25BC;</span>
+          </button>
+          <div v-if="showDropdown" class="dropdown-menu">
+            <button @click="logout">Logout</button>
+          </div>
+        </div>
+      </div>
+  
+      <table class="parameters-table">
+        <thead>
+          <tr>
+            <th>Parameter Key</th>
+            <th>Value</th>
+            <th>Description</th>
+            <th>Create Date &#x2193;</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(parameter, index) in parameters" :key="index">
+            <td>
+              <input
+                v-if="parameter.isEditing"
+                v-model="parameter.editKey"
+                placeholder="Parameter Key"
+              />
+              <span v-else>{{ parameter.key }}</span>
+            </td>
+            <td>
+              <input
+                v-if="parameter.isEditing"
+                v-model="parameter.editValue"
+                placeholder="Value"
+              />
+              <span v-else>{{ parameter.value }}</span>
+            </td>
+            <td>
+              <input
+                v-if="parameter.isEditing"
+                v-model="parameter.editDescription"
+                placeholder="Description"
+              />
+              <span v-else>{{ parameter.description }}</span>
+            </td>
+            <td>{{ parameter.createDate }}</td>
+            <td class="actions">
+              <button
+                v-if="parameter.isEditing"
+                @click="saveEdit(parameter)"
+                class="save-button"
+              >
+                Save
+              </button>
+              <button
+                v-if="parameter.isEditing"
+                @click="cancelEdit(parameter)"
+                class="cancel-button"
+              >
+                Cancel
+              </button>
+              <button
+                v-else
+                @click="editParameter(parameter)"
+                class="edit-button"
+              >
+                Edit
+              </button>
+              <button @click="deleteParameter(parameter.id)" class="delete-button">
+                Delete
+              </button>
+            </td>
+          </tr>
+    
+          <tr class="add-parameter-row">
+            <td><input type="text" placeholder="New Parameter" v-model="newParameter.key" /></td>
+            <td><input type="text" placeholder="Value" v-model="newParameter.value" /></td>
+            <td><input type="text" placeholder="New Description" v-model="newParameter.description" /></td>
+           <td></td>
+            <td><button class="add-button" @click="addParameter">ADD</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </template>
+  
+  <script>
+
+  
+  export default {    
+    data() {
+      return {
+        showDropdown: false,
+        parameters: [],
+        newParameter: {
+          key: '',
+          value: '',
+          description: '',
+        }
+      };
+    },
+    mounted() {
+    },
+    methods: {
+        toggleDropdown() {
+      this.showDropdown = !this.showDropdown;
+    },
+      logout() {
+      auth.signOut().then(() => {
+        this.$router.push('/');
+      });
+    }
+     
+    }
+  };
+  </script>
+  
+  <style scoped>
+  .dashboard {
+    background-color: #0b0b28;
+    color: #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+  }
+  
+  .logo {
+    height: 40px;
+  }
+  
+  .profile-dropdown {
+    position: relative;
+  }
+  
+  .profile-button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-icon {
+    margin-right: 5px;
+    font-size: 18px;
+  }
+  
+  .dropdown-icon {
+    margin-left: 5px;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: #252548;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .dropdown-menu button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px 10px;
+    text-align: left;
+    width: 100%;
+  }
+  
+  .dropdown-menu button:hover {
+    background-color: #3a3a5e;
+  }
+  
+  .parameters-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .parameters-table th, .parameters-table td {
+    padding: 10px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #444;
+  }
+  
+  .parameters-table th {
+    color: #8b94bc;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .edit-button, .delete-button, .save-button, .cancel-button, .add-button {
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .edit-button {
+    background-color: #3a86ff;
+    color: white;
+  }
+  
+  .delete-button {
+    background-color: #ef476f;
+    color: white;
+  }
+  
+  .save-button {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .cancel-button {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  
+  
+  input[type="text"] {
+    font-size: 18px;
+    width: 90%;
+    padding: 1rem;
+    border-radius: .5rem ;
+    border: 1px solid #8b7591;
+    background-color: #252548;
+    color: #fff;
+    outline: none;
+  }
+  
+  
+  .add-parameter-row td:nth-child(1),
+  .add-parameter-row td:nth-child(2) {
+    width: 20%;
+  }
+  
+  .add-parameter-row td:nth-child(3) {
+    width: 40%;
+  }
+  
+  .add-button {
+    background-color: #00b4d8;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+  </style>
+  
