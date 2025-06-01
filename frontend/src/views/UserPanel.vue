@@ -2,7 +2,7 @@
     <div class="dashboard">
       <div class="header">
         <img src="@/assets/icon.png" alt="Logo" class="logo" />
-       
+  
         <div class="profile-dropdown">
           <button @click="toggleDropdown" class="profile-button">
             <i class="fas fa-user profile-icon"></i>
@@ -27,99 +27,200 @@
         <tbody>
           <tr v-for="(parameter, index) in parameters" :key="index">
             <td>
-              <input
-                v-if="parameter.isEditing"
-                v-model="parameter.editKey"
-                placeholder="Parameter Key"
-              />
+              <input v-if="parameter.isEditing" v-model="parameter.editKey"  placeholder="New Parameter"/>
               <span v-else>{{ parameter.key }}</span>
             </td>
             <td>
-              <input
-                v-if="parameter.isEditing"
-                v-model="parameter.editValue"
-                placeholder="Value"
-              />
+              <input v-if="parameter.isEditing" v-model="parameter.editValue"  placeholder="Value" />
               <span v-else>{{ parameter.value }}</span>
             </td>
             <td>
-              <input
-                v-if="parameter.isEditing"
-                v-model="parameter.editDescription"
-                placeholder="Description"
-              />
+              <input v-if="parameter.isEditing" v-model="parameter.editDescription"  placeholder="Description" />
               <span v-else>{{ parameter.description }}</span>
             </td>
             <td>{{ parameter.createDate }}</td>
-            <td class="actions">
-              <button
-                v-if="parameter.isEditing"
-                @click="saveEdit(parameter)"
-                class="save-button"
-              >
-                Save
-              </button>
-              <button
-                v-if="parameter.isEditing"
-                @click="cancelEdit(parameter)"
-                class="cancel-button"
-              >
-                Cancel
-              </button>
-              <button
-                v-else
-                @click="editParameter(parameter)"
-                class="edit-button"
-              >
-                Edit
-              </button>
-              <button @click="deleteParameter(parameter.id)" class="delete-button">
-                Delete
-              </button>
+            <td>
+              <button v-if="parameter.isEditing" @click="saveEdit(parameter)">Save</button>
+              <button v-if="parameter.isEditing" @click="cancelEdit(parameter)">Cancel</button>
+              <button v-else @click="editParameter(parameter)">Edit</button>
+              <button @click="deleteParameter(parameter.id)">Delete</button>
             </td>
           </tr>
-    
-          <tr class="add-parameter-row">
-            <td><input type="text" placeholder="New Parameter" v-model="newParameter.key" /></td>
-            <td><input type="text" placeholder="Value" v-model="newParameter.value" /></td>
-            <td><input type="text" placeholder="New Description" v-model="newParameter.description" /></td>
-           <td></td>
-            <td><button class="add-button" @click="addParameter">ADD</button></td>
+  
+          <tr>
+            <td>
+                <input v-model="newParameter.key" placeholder="New Parameter" />
+               
+            </td>
+            <td>
+                <input v-model="newParameter.value" placeholder="Value" />
+         
+            </td>
+            <td>
+                <input v-model="newParameter.description" placeholder="Description" />
+                
+            </td>
+            <td></td>
+            <td><button @click="addParameter">ADD</button></td>
+          </tr>
+          <tr>
+            <td>
+                <p v-if="errors.key" class="error-text">{{ errors.key }}</p>
+            </td>
+            <td>
+                <p v-if="errors.value" class="error-text">{{ errors.value }}</p>
+            </td>
+            <td>
+                <p v-if="errors.description" class="error-text">{{ errors.description }}</p>
+            </td>
+           
           </tr>
         </tbody>
       </table>
     </div>
   </template>
   
-  <script>
-
+  <script setup>
+  import { ref, onMounted } from 'vue'
+  import { auth } from '@/firebase/firebase'
+  import { useRouter } from 'vue-router'
+  import axios from 'axios'
   
-  export default {    
-    data() {
-      return {
-        showDropdown: false,
-        parameters: [],
-        newParameter: {
-          key: '',
-          value: '',
-          description: '',
+  const router = useRouter()
+  const errors = ref({
+  key: '',
+  value: '',
+  description: ''
+})
+
+  const showDropdown = ref(false)
+  const parameters = ref([])
+  const newParameter = ref({
+    key: '',
+    value: '',
+    description: ''
+  })
+
+  const addParameter = async () => {
+   
+    errors.value = { key: '', value: '', description: '' }
+
+    let hasError = false;
+
+    if (!newParameter.value.key.trim()) {
+        errors.value.key = 'Parameter key is required.';
+        hasError = true;
+    }
+    if (!newParameter.value.value.toString().trim()) {
+        errors.value.value = 'Value is required.';
+        hasError = true;
+    }
+    if (!newParameter.value.description.trim()) {
+        errors.value.description = 'Description is required.';
+        hasError = true;
+    }
+
+    if (hasError) return;
+
+
+  try {
+    const user = auth.currentUser
+    const idToken = await user.getIdToken()
+
+    const response = await axios.post('http://localhost:3000/config', {
+      key: newParameter.value.key,
+      value: newParameter.value.value,
+      description: newParameter.value.description
+    }, {
+      headers: {
+        Authorization: `Bearer ${idToken}`
+      }
+    })
+
+    console.log('Parameter is added.', response.data)
+
+   
+    parameters.value.push({
+      key: newParameter.value.key,
+      value: newParameter.value.value,
+      description: newParameter.value.description,
+      createDate: new Date().toISOString()
+    })
+
+    newParameter.value = {
+      key: '',
+      value: '',
+      description: ''
+    }
+
+  } catch (error) {
+    console.error('Error while adding parameter!', error)
+  }
+    }
+
+    const editParameter = (parameter) => {
+  parameter.isEditing = true
+  parameter.editKey = parameter.key
+  parameter.editValue = parameter.value
+  parameter.editDescription = parameter.description
+}
+
+const cancelEdit = (parameter) => {
+  parameter.isEditing = false
+}
+
+const saveEdit = async (parameter) => {
+  try {
+    const user = auth.currentUser
+    const idToken = await user.getIdToken()
+
+    const response = await axios.patch(`http://localhost:3000/config/${parameter.id}`, {
+      key: parameter.editKey,
+      value: parameter.editValue,
+      description: parameter.editDescription
+    }, {
+      headers: {
+        Authorization: `Bearer ${idToken}`
+      }
+    })
+
+   
+    parameter.key = parameter.editKey
+    parameter.value = parameter.editValue
+    parameter.description = parameter.editDescription
+    parameter.isEditing = false
+
+  } catch (error) {
+    console.error('Update failed:', error)
+  }
+}
+  
+  const toggleDropdown = () => {
+    showDropdown.value = !showDropdown.value
+  }
+  
+  const logout = async () => {
+    await auth.signOut()
+    router.push('/signin')
+  }
+  
+  onMounted(async () => {
+    try {
+      const user = auth.currentUser
+      const idToken = await user.getIdToken()
+  
+      const response = await axios.get('http://localhost:3000/config', {
+        headers: {
+          Authorization: `Bearer ${idToken}`
         }
-      };
-    },
-    mounted() {
-    },
-    methods: {
-        toggleDropdown() {
-      this.showDropdown = !this.showDropdown;
-    },
-      logout() {
-      auth.signOut().then(() => {
-        this.$router.push('/');
-      });
+      })
+  
+      parameters.value = response.data.parameters
+    } catch (error) {
+      console.error('Error fetching config:', error)
     }
-     
-    }
-  };
+  })
+  
   </script>
   
   <style scoped>
@@ -268,5 +369,11 @@
     border-radius: 5px;
     width: 100%;
   }
+
+  .error-text {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
   </style>
   
