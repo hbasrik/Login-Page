@@ -5,10 +5,11 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const configRoutes = require('./src/routes/configRoutes');
+const authRoutes = require('./src/routes/authRoutes')
 
 app.use(cors());
 app.use(express.json());
-
+app.use(authRoutes) ;
 app.use(configRoutes);
 
 const PORT = process.env.PORT || 3000;

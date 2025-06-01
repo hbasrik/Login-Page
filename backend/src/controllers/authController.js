@@ -8,6 +8,8 @@ const signIn = async (req, res) => {
 
   const idToken = authHeader.split('Bearer ')[1]
 
+  // console.log('ID Token:', idToken)
+
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken)
     return res.status(200).json({ message: 'Sign-in successful', uid: decodedToken.uid })
