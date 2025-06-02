@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <table class="parameters-table">
+    <!-- <table class="parameters-table">
       <thead>
         <tr>
           <th>Parameter Key</th>
@@ -48,10 +48,14 @@
           </td>
           <td>{{ formatDate(parameter.createDate) }}</td>
           <td>
-            <button v-if="parameter.isEditing" @click="saveEdit(parameter)">Save</button>
-            <button v-if="parameter.isEditing" @click="cancelEdit(parameter)">Cancel</button>
-            <button v-else @click="editParameter(parameter)">Edit</button>
-            <button @click="deleteParameter(parameter.id)">Delete</button>
+            <div v-if="parameter.isEditing">
+              <button @click="saveEdit(parameter)" class="save-button">Save</button>
+              <button @click="cancelEdit(parameter)" class="cancel-button">Cancel</button>
+            </div>
+            <div v-else @click="editParameter(parameter)">
+              <button class="edit-button">Edit</button>
+              <button @click="deleteParameter(parameter.id)" class="delete-button">Delete</button>
+            </div>
           </td>
         </tr>
 
@@ -65,8 +69,8 @@
           <td>
             <input v-model="newParameter.description" placeholder="Description" />
           </td>
-          <td></td>
-          <td><button @click="addParameter">ADD</button></td>
+
+          <td><button @click="addParameter" class="add-button">ADD</button></td>
         </tr>
         <tr>
           <td>
@@ -80,7 +84,159 @@
           </td>
         </tr>
       </tbody>
-    </table>
+    </table> -->
+    <div class="grid grid-cols-1 gap-4">
+      <div class="hidden md:grid grid-cols-6 justify-between p-1 text-xl">
+        <div>
+          <p>Parameter Key</p>
+        </div>
+        <div>
+          <p>Value</p>
+        </div>
+        <div class="col-span-2">
+          <p>Description</p>
+        </div>
+        <div>
+          <p>Create Date</p>
+        </div>
+        <div>
+          <p></p>
+        </div>
+      </div>
+
+      <div
+        v-for="(parameter, index) in parameters"
+        :key="index"
+        class="rounded-lg border-2 border-white-500 md:grid md:border-none grid-cols-6"
+      >
+        <div class="md:grid grid-cols-5 justify-between col-span-5 items-center p-1">
+          <div class="">
+            <p v-if="!parameter.isEditing">
+              <strong class="md:hidden text-white">Parameter Key:</strong> {{ parameter.key }}
+            </p>
+            <input
+              v-if="parameter.isEditing"
+              v-model="parameter.editKey"
+              placeholder="New Parameter"
+              class="w-full rounded bg-gray-800 border border-gray-600 text-white"
+            />
+          </div>
+
+          <div class="">
+            <p v-if="!parameter.isEditing">
+              <strong class="md:hidden text-white">Value:</strong> {{ parameter.value }}
+            </p>
+            <input
+              v-if="parameter.isEditing"
+              v-model="parameter.editValue"
+              placeholder="Value"
+              class="w-full rounded bg-gray-800 border border-gray-600 text-white"
+            />
+          </div>
+
+          <div class="col-span-2">
+            <p v-if="!parameter.isEditing">
+              <strong class="text-white md:hidden">Description:</strong> {{ parameter.description }}
+            </p>
+            <input
+              v-if="parameter.isEditing"
+              v-model="parameter.editDescription"
+              placeholder="Description"
+              class="w-full rounded bg-gray-800 border border-gray-600 text-white"
+            />
+          </div>
+          <div class="col-span-1">
+            <p class="text-white">
+              <strong class="md:hidden">Create Date:</strong> {{ formatDate(parameter.createDate) }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex col-span-1 justify-center md:justify-start gap-2 py-2 max-h-[60px]">
+          <template v-if="parameter.isEditing">
+            <button
+              @click="saveEdit(parameter)"
+              class="bg-green-600 text-white px-4 py-2 rounded transition duration-200 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+            >
+              Save
+            </button>
+            <button
+              @click="cancelEdit(parameter)"
+              class="bg-gray-600 text-white px-4 py-2 rounded transition duration-200 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            >
+              Cancel
+            </button>
+          </template>
+
+          <template v-else>
+            <button
+              @click="editParameter(parameter)"
+              class="bg-blue-600 text-white px-4 py-2 rounded transition duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              Edit
+            </button>
+            <button
+              @click="deleteParameter(parameter.id)"
+              class="bg-red-500 text-white px-4 py-2 rounded transition duration-200 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+            >
+              <span class="hidden md:inline">Delete</span>
+              <span class="inline md:hidden">Del</span>
+            </button>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-lg md:grid grid-cols-6 mt-4 text-sm text-center md:text-start">
+      <div class="mb-2">
+        <input
+          v-model="newParameter.key"
+          placeholder="New Parameter"
+          class="w-full rounded bg-gray-800 border border-gray-600 text-white p-2.5"
+        />
+      </div>
+
+      <div class="mb-2">
+        <input
+          v-model="newParameter.value"
+          placeholder="Value"
+          class="w-full rounded bg-gray-800 border border-gray-600 text-white p-2.5"
+        />
+      </div>
+
+      <div class="mb-2 col-span-3">
+        <input
+          v-model="newParameter.description"
+          placeholder="Description"
+          class="w-full rounded bg-gray-800 border border-gray-600 text-white p-2.5"
+        />
+      </div>
+
+      <div class="flex gap-2 py-2 max-h-[60px] justify-center md:justify-start">
+        <button
+          @click="addParameter"
+          class="bg-cyan-600 text-white px-4 py-2 rounded transition duration-200 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+        >
+          ADD
+        </button>
+      </div>
+    </div>
+    <div class="grid-cols-6 grid justify-start">
+      <div
+        v-if="alert.visible"
+        :class="[
+          'fixed top-8 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full rounded shadow-lg px-6 py-4 text-white transition-opacity duration-300',
+          alert.type === 'success'
+            ? 'bg-green-600'
+            : alert.type === 'error'
+              ? 'bg-red-600'
+              : 'bg-gray-800',
+        ]"
+      >
+        <strong class="block text-lg mb-1">{{ alert.title }}</strong>
+        <span>{{ alert.message }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -96,6 +252,22 @@ const errors = ref({
   value: '',
   description: '',
 })
+
+const alert = ref({
+  visible: false,
+  type: 'success',
+  title: '',
+  message: '',
+})
+let alertTimeout = null
+
+const showAlert = ({ type = 'success', title = '', message = '' }) => {
+  alert.value = { visible: true, type, title, message }
+  if (alertTimeout) clearTimeout(alertTimeout)
+  alertTimeout = setTimeout(() => {
+    alert.value.visible = false
+  }, 2000)
+}
 
 const showDropdown = ref(false)
 const parameters = ref([])
@@ -118,7 +290,6 @@ const formatDate = (dateStr) => {
 
 const addParameter = async () => {
   errors.value = { key: '', value: '', description: '' }
-
   let hasError = false
 
   if (!newParameter.value.key.trim()) {
@@ -134,7 +305,14 @@ const addParameter = async () => {
     hasError = true
   }
 
-  if (hasError) return
+  if (hasError) {
+    showAlert({
+      type: 'error',
+      title: 'Validation Error',
+      message: 'Please fill in all required fields.',
+    })
+    return
+  }
 
   try {
     const user = auth.currentUser
@@ -154,8 +332,6 @@ const addParameter = async () => {
       },
     )
 
-    console.log('Parameter is added.', response.data)
-
     parameters.value.push({
       key: newParameter.value.key,
       value: newParameter.value.value,
@@ -168,8 +344,11 @@ const addParameter = async () => {
       value: '',
       description: '',
     }
+
+    showAlert({ type: 'success', title: 'Success', message: 'Parameter added successfully.' })
   } catch (error) {
     console.error('Error while adding parameter!', error)
+    showAlert({ type: 'error', title: 'Add Error', message: 'Failed to add parameter.' })
   }
 }
 
@@ -185,7 +364,6 @@ const cancelEdit = (parameter) => {
   parameter.editValue = parameter.value
   parameter.editDescription = parameter.description
   parameter.isEditing = false
-
   errors.value = { key: '', value: '', description: '' }
 }
 
@@ -206,7 +384,14 @@ const saveEdit = async (parameter) => {
     hasError = true
   }
 
-  if (hasError) return
+  if (hasError) {
+    showAlert({
+      type: 'error',
+      title: 'Validation Error',
+      message: 'Please fill in all required fields.',
+    })
+    return
+  }
 
   try {
     const user = auth.currentUser
@@ -230,8 +415,11 @@ const saveEdit = async (parameter) => {
     parameter.value = parameter.editValue
     parameter.description = parameter.editDescription
     parameter.isEditing = false
+
+    showAlert({ type: 'success', title: 'Success', message: 'Parameter updated successfully.' })
   } catch (error) {
     console.error('Update failed:', error)
+    showAlert({ type: 'error', title: 'Update Error', message: 'Failed to update parameter.' })
   }
 }
 
@@ -247,8 +435,11 @@ const deleteParameter = async (id) => {
     })
 
     parameters.value = parameters.value.filter((param) => param.id !== id)
+
+    showAlert({ type: 'success', title: 'Deleted', message: 'Parameter deleted successfully.' })
   } catch (error) {
     console.error('Delete failed:', error)
+    showAlert({ type: 'error', title: 'Delete Error', message: 'Failed to delete parameter.' })
   }
 }
 
@@ -275,6 +466,7 @@ onMounted(async () => {
     parameters.value = response.data.parameters
   } catch (error) {
     console.error('Error fetching config:', error)
+    showAlert({ type: 'error', title: 'Fetch Error', message: 'Failed to load parameters.' })
   }
 })
 </script>
@@ -287,7 +479,6 @@ onMounted(async () => {
   min-height: 100vh;
   color: #ccc;
   padding: 20px;
-  border-radius: 10px;
   min-height: 100vh;
   box-sizing: border-box;
 }
@@ -325,6 +516,9 @@ onMounted(async () => {
   margin-left: 5px;
 }
 
+button {
+  cursor: pointer;
+}
 .dropdown-menu {
   position: absolute;
   right: 0;
@@ -349,97 +543,26 @@ onMounted(async () => {
   background-color: #3a3a5e;
 }
 
-.parameters-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-.parameters-table table tr {
-  text-decoration: none !important;
-}
-
-.parameters-table th,
-.parameters-table td {
-  padding: 10px 14px;
-  text-align: left;
-  vertical-align: middle;
-  border-bottom: 1px solid #444;
-  text-decoration: none;
-  border-bottom: none;
-}
-
-.parameters-table th {
-  color: #8b94bc;
-}
-
 .actions {
   display: flex;
   gap: 5px;
 }
 
-.edit-button,
-.delete-button,
-.save-button,
-.cancel-button,
-.add-button {
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  border: none;
-}
-
-.edit-button {
-  background-color: #3a86ff;
-  color: white;
-}
-
-.delete-button {
-  background-color: #ef476f;
-  color: white;
-}
-
-.save-button {
-  background-color: #28a745;
-  color: white;
-}
-
-.cancel-button {
-  background-color: #6c757d;
-  color: white;
-}
-
-input[type='text'] {
-  font-size: 18px;
+input {
+  padding: 0.5rem;
   width: 90%;
-  padding: 1rem;
   border-radius: 0.5rem;
   border: 1px solid #8b7591;
   background-color: #252548;
   color: #fff;
   outline: none;
 }
-
-.add-parameter-row td:nth-child(1),
-.add-parameter-row td:nth-child(2) {
-  width: 20%;
+input:focus {
+  border: 1px solid rgb(126, 7, 126);
+  box-shadow: 0 0 5px rgb(126, 7, 126);
 }
 
-.add-parameter-row td:nth-child(3) {
-  width: 40%;
-}
-
-.add-button {
-  background-color: #00b4d8;
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  width: 100%;
-}
-
-.error-text {
-  color: #e74c3c;
-  font-size: 0.85rem;
-  margin-top: 0.25rem;
+input::placeholder {
+  color: #aaa;
 }
 </style>
