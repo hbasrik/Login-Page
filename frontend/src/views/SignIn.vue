@@ -29,7 +29,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../firebase/firebase'
 import { signInWithEmailAndPassword } from 'firebase/auth'
-import axios from 'axios'
+import api from '@/api/axios'
 
 const email = ref('')
 const password = ref('')
@@ -45,8 +45,8 @@ const handleSubmit = async () => {
     const user = userCredential.user
     const idToken = await user.getIdToken()
 
-    await axios.post(
-      'http://localhost:3000/signin',
+    await api.post(
+      '/signin',
       {},
       {
         headers: {

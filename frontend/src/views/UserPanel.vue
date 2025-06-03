@@ -10,7 +10,12 @@
           <span class="dropdown-icon text-[8px]">&#x25BC;</span>
         </button>
         <div v-if="showDropdown" class="dropdown-menu">
-          <button @click="logout">Logout</button>
+          <button
+            class="hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+            @click="logout"
+          >
+            Logout
+          </button>
         </div>
       </div>
     </div>
@@ -58,10 +63,11 @@
               <strong class="md:hidden text-white">Value:</strong> {{ parameter.value }}
             </p>
             <input
+              type="number"
               v-if="parameter.isEditing"
               v-model="parameter.editValue"
               placeholder="Value"
-              class="w-full rounded bg-gray-800 border border-gray-600 text-white"
+              class="w-full rounded bg-gray-800 border border-gray-600 text-white no-spinner"
             />
           </div>
 
@@ -131,9 +137,10 @@
 
       <div class="mb-2">
         <input
+          type="number"
           v-model="newParameter.value"
           placeholder="Value"
-          class="w-full rounded bg-gray-800 border border-gray-600 text-white p-2.5"
+          class="w-full rounded bg-gray-800 border border-gray-600 text-white p-2.5 no-spinner"
         />
       </div>
 
@@ -177,7 +184,7 @@
 import { ref, onMounted } from 'vue'
 import { auth } from '@/firebase/firebase'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import api from '@/api/axios'
 
 const router = useRouter()
 const viewKey = ref(Date.now())
@@ -259,8 +266,8 @@ const addParameter = async () => {
     const user = auth.currentUser
     const idToken = await user.getIdToken()
 
-    const response = await axios.post(
-      'http://localhost:3000/config',
+    const response = await api.post(
+      '/config',
       {
         key: newParameter.value.key,
         value: newParameter.value.value,
@@ -335,9 +342,8 @@ const saveEdit = async (parameter) => {
   try {
     const user = auth.currentUser
     const idToken = await user.getIdToken()
-
-    const response = await axios.patch(
-      `http://localhost:3000/config/${parameter.id}`,
+    const response = await api.patch(
+      `/config/${parameter.id}`,
       {
         key: parameter.editKey,
         value: parameter.editValue,
@@ -386,7 +392,7 @@ const deleteParameter = async (id) => {
     const user = auth.currentUser
     const idToken = await user.getIdToken()
 
-    await axios.delete(`http://localhost:3000/config/${id}`, {
+    await api.delete(`/config/${id}`, {
       headers: {
         Authorization: `Bearer ${idToken}`,
       },
@@ -424,7 +430,7 @@ onMounted(async () => {
   try {
     const user = auth.currentUser
     const idToken = await user.getIdToken()
-    const response = await axios.get('http://localhost:3000/config', {
+    const response = await api.get('/config', {
       headers: { Authorization: `Bearer ${idToken}` },
     })
     parameters.value = response.data.parameters
@@ -436,8 +442,6 @@ onMounted(async () => {
       message: 'Failed to load parameters.',
     })
   }
-
-  document.addEventListener('click', handleClickOutside)
 })
 
 const goHome = () => {
@@ -513,6 +517,7 @@ button {
 .dropdown-menu button {
   background: none;
   border: none;
+  border-radius: 5%;
   color: white;
   cursor: pointer;
   padding: 5px 10px;
@@ -521,7 +526,11 @@ button {
 }
 
 .dropdown-menu button:hover {
-  background-color: #3a3a5e;
+  box-shadow: 0 2px 2px 0px rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-menu button:focus {
+  box-shadow: 0 0 0 2px #3f3f5d;
 }
 
 .actions {
@@ -545,5 +554,10 @@ input:focus {
 
 input::placeholder {
   color: #aaa;
+}
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 </style>
