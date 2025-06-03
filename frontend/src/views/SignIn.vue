@@ -81,25 +81,25 @@ const handleSubmit = async () => {
   width: 100%;
   height: auto;
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 3rem;
 }
 
 h2 {
+  font-size: x-large;
   color: #8e8eb9;
-  margin-bottom: 20px;
+  margin-bottom: 3rem;
 }
 
 input[type='email'],
 input[type='password'] {
   font-size: 18px;
-  width: 90%;
+  width: 100%;
   padding: 1rem;
   border-radius: 0.5rem 0.5rem 0 0;
   border: 1px solid #8b7591;
   background-color: #252548;
   color: #fff;
   outline: none;
-  margin-bottom: 12px;
 }
 
 input[type='password'] {

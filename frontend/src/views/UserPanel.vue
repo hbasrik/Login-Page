@@ -1,12 +1,13 @@
 <template>
   <div class="dashboard">
     <div class="header">
-      <img src="@/assets/icon.png" alt="Logo" class="logo" />
-
+      <button @click="goHome">
+        <img src="@/assets/icon.png" alt="Logo" class="logo" />
+      </button>
       <div class="profile-dropdown">
         <button @click="toggleDropdown" class="profile-button">
           <i class="fas fa-user profile-icon"></i>
-          <span class="dropdown-icon">&#x25BC;</span>
+          <span class="dropdown-icon text-[8px]">&#x25BC;</span>
         </button>
         <div v-if="showDropdown" class="dropdown-menu">
           <button @click="logout">Logout</button>
@@ -14,77 +15,6 @@
       </div>
     </div>
 
-    <!-- <table class="parameters-table">
-      <thead>
-        <tr>
-          <th>Parameter Key</th>
-          <th>Value</th>
-          <th>Description</th>
-          <th>Create Date &#x2193;</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(parameter, index) in parameters" :key="index">
-          <td>
-            <input
-              v-if="parameter.isEditing"
-              v-model="parameter.editKey"
-              placeholder="New Parameter"
-            />
-            <span v-else>{{ parameter.key }}</span>
-          </td>
-          <td>
-            <input v-if="parameter.isEditing" v-model="parameter.editValue" placeholder="Value" />
-            <span v-else>{{ parameter.value }}</span>
-          </td>
-          <td>
-            <input
-              v-if="parameter.isEditing"
-              v-model="parameter.editDescription"
-              placeholder="Description"
-            />
-            <span v-else>{{ parameter.description }}</span>
-          </td>
-          <td>{{ formatDate(parameter.createDate) }}</td>
-          <td>
-            <div v-if="parameter.isEditing">
-              <button @click="saveEdit(parameter)" class="save-button">Save</button>
-              <button @click="cancelEdit(parameter)" class="cancel-button">Cancel</button>
-            </div>
-            <div v-else @click="editParameter(parameter)">
-              <button class="edit-button">Edit</button>
-              <button @click="deleteParameter(parameter.id)" class="delete-button">Delete</button>
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td>
-            <input v-model="newParameter.key" placeholder="New Parameter" />
-          </td>
-          <td>
-            <input v-model="newParameter.value" placeholder="Value" />
-          </td>
-          <td>
-            <input v-model="newParameter.description" placeholder="Description" />
-          </td>
-
-          <td><button @click="addParameter" class="add-button">ADD</button></td>
-        </tr>
-        <tr>
-          <td>
-            <p v-if="errors.key" class="error-text">{{ errors.key }}</p>
-          </td>
-          <td>
-            <p v-if="errors.value" class="error-text">{{ errors.value }}</p>
-          </td>
-          <td>
-            <p v-if="errors.description" class="error-text">{{ errors.description }}</p>
-          </td>
-        </tr>
-      </tbody>
-    </table> -->
     <div class="grid grid-cols-1 gap-4">
       <div class="hidden md:grid grid-cols-6 justify-between p-1 text-xl">
         <div>
@@ -96,8 +26,9 @@
         <div class="col-span-2">
           <p>Description</p>
         </div>
-        <div>
+        <div class="flex gap-2 items-center">
           <p>Create Date</p>
+          <i class="fa-solid fa-arrow-down"></i>
         </div>
         <div>
           <p></p>
@@ -107,7 +38,7 @@
       <div
         v-for="(parameter, index) in parameters"
         :key="index"
-        class="rounded-lg border-2 border-white-500 md:grid md:border-none grid-cols-6"
+        class="rounded-lg border-2 border-white-500 md:grid md:border-none grid-cols-6 items-center"
       >
         <div class="md:grid grid-cols-5 justify-between col-span-5 items-center p-1">
           <div class="">
@@ -152,17 +83,19 @@
           </div>
         </div>
 
-        <div class="flex col-span-1 justify-center md:justify-start gap-2 py-2 max-h-[60px]">
+        <div
+          class="flex col-span-1 justify-center md:justify-start gap-2 py-2 max-h-[60px] items-end"
+        >
           <template v-if="parameter.isEditing">
             <button
               @click="saveEdit(parameter)"
-              class="bg-green-600 text-white px-4 py-2 rounded transition duration-200 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+              class="bg-green-600 text-white px-4 py-1 rounded transition duration-200 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
             >
               Save
             </button>
             <button
               @click="cancelEdit(parameter)"
-              class="bg-gray-600 text-white px-4 py-2 rounded transition duration-200 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              class="bg-gray-600 text-white px-4 py-1 rounded transition duration-200 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400"
             >
               Cancel
             </button>
@@ -171,13 +104,13 @@
           <template v-else>
             <button
               @click="editParameter(parameter)"
-              class="bg-blue-600 text-white px-4 py-2 rounded transition duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              class="bg-blue-600 text-white px-4 py-1 rounded transition duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               Edit
             </button>
             <button
               @click="deleteParameter(parameter.id)"
-              class="bg-red-500 text-white px-4 py-2 rounded transition duration-200 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+              class="bg-red-500 text-white px-4 py-1 rounded transition duration-200 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
             >
               <span class="hidden md:inline">Delete</span>
               <span class="inline md:hidden">Del</span>
@@ -212,10 +145,10 @@
         />
       </div>
 
-      <div class="flex gap-2 py-2 max-h-[60px] justify-center md:justify-start">
+      <div class="flex gap-2 py-1 max-h-[40px] justify-center md:justify-start">
         <button
           @click="addParameter"
-          class="bg-cyan-600 text-white px-4 py-2 rounded transition duration-200 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          class="bg-cyan-600 text-white px-4 rounded transition duration-200 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400"
         >
           ADD
         </button>
@@ -247,6 +180,7 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 const router = useRouter()
+const viewKey = ref(Date.now())
 const errors = ref({
   key: '',
   value: '',
@@ -287,7 +221,6 @@ const formatDate = (dateStr) => {
     minute: '2-digit',
   })
 }
-
 const addParameter = async () => {
   errors.value = { key: '', value: '', description: '' }
   let hasError = false
@@ -315,6 +248,14 @@ const addParameter = async () => {
   }
 
   try {
+    const now = new Date().toLocaleString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+
     const user = auth.currentUser
     const idToken = await user.getIdToken()
 
@@ -324,6 +265,7 @@ const addParameter = async () => {
         key: newParameter.value.key,
         value: newParameter.value.value,
         description: newParameter.value.description,
+        updatedAt: now,
       },
       {
         headers: {
@@ -333,18 +275,15 @@ const addParameter = async () => {
     )
 
     parameters.value.push({
+      id: response.data.id,
       key: newParameter.value.key,
       value: newParameter.value.value,
       description: newParameter.value.description,
-      createDate: new Date().toISOString(),
+      createDate: now,
+      updatedAt: now,
     })
 
-    newParameter.value = {
-      key: '',
-      value: '',
-      description: '',
-    }
-
+    newParameter.value = { key: '', value: '', description: '' }
     showAlert({ type: 'success', title: 'Success', message: 'Parameter added successfully.' })
   } catch (error) {
     console.error('Error while adding parameter!', error)
@@ -403,6 +342,7 @@ const saveEdit = async (parameter) => {
         key: parameter.editKey,
         value: parameter.editValue,
         description: parameter.editDescription,
+        updatedAt: parameter.updatedAt,
       },
       {
         headers: {
@@ -414,12 +354,30 @@ const saveEdit = async (parameter) => {
     parameter.key = parameter.editKey
     parameter.value = parameter.editValue
     parameter.description = parameter.editDescription
+    parameter.updatedAt = response.data.updatedAt
     parameter.isEditing = false
 
-    showAlert({ type: 'success', title: 'Success', message: 'Parameter updated successfully.' })
+    showAlert({
+      type: 'success',
+      title: 'Success',
+      message: 'Parameter updated successfully.',
+    })
   } catch (error) {
     console.error('Update failed:', error)
-    showAlert({ type: 'error', title: 'Update Error', message: 'Failed to update parameter.' })
+
+    if (error.response?.status === 409) {
+      showAlert({
+        type: 'error',
+        title: 'Conflict Error',
+        message: 'This parameter was updated by another user. Please refresh and try again.',
+      })
+    } else {
+      showAlert({
+        type: 'error',
+        title: 'Update Error',
+        message: 'Failed to update parameter.',
+      })
+    }
   }
 }
 
@@ -453,22 +411,45 @@ const logout = async () => {
 }
 
 onMounted(async () => {
+  parameters.value.forEach((param) => {
+    param.isEditing = false
+    param.editKey = ''
+    param.editValue = ''
+    param.editDescription = ''
+  })
+
+  newParameter.value = { key: '', value: '', description: '' }
+  errors.value = { key: '', value: '', description: '' }
+
   try {
     const user = auth.currentUser
     const idToken = await user.getIdToken()
-
     const response = await axios.get('http://localhost:3000/config', {
-      headers: {
-        Authorization: `Bearer ${idToken}`,
-      },
+      headers: { Authorization: `Bearer ${idToken}` },
     })
-
     parameters.value = response.data.parameters
   } catch (error) {
     console.error('Error fetching config:', error)
-    showAlert({ type: 'error', title: 'Fetch Error', message: 'Failed to load parameters.' })
+    showAlert({
+      type: 'error',
+      title: 'Fetch Error',
+      message: 'Failed to load parameters.',
+    })
   }
+
+  document.addEventListener('click', handleClickOutside)
 })
+
+const goHome = () => {
+  parameters.value.forEach((param) => {
+    param.isEditing = false
+    param.editKey = ''
+    param.editValue = ''
+    param.editDescription = ''
+  })
+  newParameter.value = { key: '', value: '', description: '' }
+  errors.value = { key: '', value: '', description: '' }
+}
 </script>
 
 <style scoped>
@@ -487,11 +468,11 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 20px;
+  margin-bottom: 4rem;
 }
 
 .logo {
-  height: 40px;
+  height: 2rem;
 }
 
 .profile-dropdown {
@@ -513,7 +494,7 @@ onMounted(async () => {
 }
 
 .dropdown-icon {
-  margin-left: 5px;
+  margin-left: 4px;
 }
 
 button {
@@ -553,7 +534,7 @@ input {
   width: 90%;
   border-radius: 0.5rem;
   border: 1px solid #8b7591;
-  background-color: #252548;
+  background: none;
   color: #fff;
   outline: none;
 }
