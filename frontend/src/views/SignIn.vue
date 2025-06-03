@@ -1,8 +1,8 @@
 <template>
-  <div class="login-container">
+  <div class="login-container flex flex-col justify-between">
     <div class="login-box">
       <img src="@/assets/icon.png" alt="Login Image" class="login-image" />
-      <h2>Please sign in</h2>
+      <h2 class="header-color">Please sign in</h2>
       <form @submit.prevent="handleSubmit">
         <div class="input-container">
           <input type="email" placeholder="E-mail address" v-model="email" required />
@@ -11,12 +11,15 @@
           <input type="password" placeholder="Password" v-model="password" required />
         </div>
         <div class="sign-button">
-          <button type="submit" :disabled="loading">
+          <button class="text-xs" type="submit" :disabled="loading">
             {{ loading ? 'Signing in...' : 'Sign in' }}
           </button>
         </div>
         <p v-if="errorMessage" class="error-msg">{{ errorMessage }}</p>
       </form>
+    </div>
+    <div class="header-color mt-4">
+      <p>Codeway © 2021</p>
     </div>
   </div>
 </template>
@@ -74,7 +77,7 @@ const handleSubmit = async () => {
   text-align: center;
   padding: 20px;
   border-radius: 8px;
-  width: 380px;
+  width: 350px;
 }
 
 .login-image {
@@ -86,19 +89,21 @@ const handleSubmit = async () => {
 
 h2 {
   font-size: x-large;
+  margin-bottom: 1rem;
+}
+
+.header-color {
   color: #8e8eb9;
-  margin-bottom: 3rem;
 }
 
 input[type='email'],
 input[type='password'] {
   font-size: 18px;
   width: 100%;
-  padding: 1rem;
+  padding: 0.5rem;
   border-radius: 0.5rem 0.5rem 0 0;
-  border: 1px solid #8b7591;
-  background-color: #252548;
-  color: #fff;
+  border: 1px solid #1e3359;
+  color: #8e8eb9;
   outline: none;
 }
 
@@ -118,7 +123,7 @@ input::placeholder {
 button {
   font-weight: 600;
   margin-top: 0.5rem;
-  font-size: 18px;
+  font-size: 14px;
   width: 100%;
   padding: 1rem;
   border: none;
