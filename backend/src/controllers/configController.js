@@ -24,13 +24,15 @@ const postConfig = async (req, res) => {
     const { key, value, description } = req.body;
 
     const now = new Date();
-    const formattedDate = now.toLocaleString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
+
+    const datePart = now.toLocaleDateString("en-GB");
+    const timePart = now.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
     });
+
+    const formattedDate = `${datePart} ${timePart}`;
 
     const docRef = await db.collection("config").add({
       key,
@@ -70,13 +72,14 @@ const updateConfig = async (req, res) => {
     }
 
     const now = new Date();
-    const newUpdatedAt = now.toLocaleString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
+    const datePart = now.toLocaleDateString("en-GB");
+    const timePart = now.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
     });
+
+    const newUpdatedAt = `${datePart} ${timePart}`;
 
     await docRef.update({
       key,
