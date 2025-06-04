@@ -152,7 +152,7 @@
         />
       </div>
 
-      <div class="flex gap-2 py-1 max-h-[40px] justify-center md:justify-start">
+      <div class="flex gap-2 py-1 justify-center md:justify-start">
         <button
           @click="addParameter"
           class="bg-cyan-600 text-white px-4 rounded transition duration-200 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400"
@@ -220,14 +220,15 @@ const newParameter = ref({
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr)
-  return date.toLocaleString('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
+  const d = date.toLocaleDateString('en-GB')
+  const t = date.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
   })
+  return `${d} ${t}`
 }
+
 const addParameter = async () => {
   errors.value = { key: '', value: '', description: '' }
   let hasError = false
@@ -255,13 +256,15 @@ const addParameter = async () => {
   }
 
   try {
-    const now = new Date().toLocaleString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
+    const now = new Date()
+    const datePart = now.toLocaleDateString('en-GB')
+    const timePart = now.toLocaleTimeString('en-GB', {
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
     })
+
+    const formattedNow = `${datePart} ${timePart}`
 
     const user = auth.currentUser
     const idToken = await user.getIdToken()
@@ -286,8 +289,8 @@ const addParameter = async () => {
       key: newParameter.value.key,
       value: newParameter.value.value,
       description: newParameter.value.description,
-      createDate: now,
-      updatedAt: now,
+      createDate: formattedNow,
+      updatedAt: formattedNow,
     })
 
     newParameter.value = { key: '', value: '', description: '' }
@@ -503,6 +506,7 @@ const goHome = () => {
 
 button {
   cursor: pointer;
+  height: 2rem;
 }
 .dropdown-menu {
   position: absolute;
